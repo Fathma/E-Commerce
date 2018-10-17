@@ -8,14 +8,28 @@ var mongo = require("mongodb");
 const multer = require("multer");
 const Product = require("../models/Product");
 
+
 //Image save to DB Start
 const mongoose = require("mongoose");
 const GridFsStorage = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
 const path = require("path");
 const crypto = require("crypto");
+const mysql = require('mysql');
+var unique = require('array-unique');
 
 const mongoURI = "mongodb://localhost:27017/e-commerce_db";
+
+// var connection = mysql.createConnection({
+// 	host     : 'localhost',
+// 	user     : 'root',
+// 	password : '1234',
+// 	database : 'test'
+// });
+// connection.connect(function(err) {
+//   if (err) throw err;
+//   console.log("Connected!");
+// });
 
 //Mongo connection
 const conn = mongoose.createConnection(mongoURI);
@@ -30,405 +44,44 @@ conn.once("open", () => {
 });
 //Image Path save start
 const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        cb(null, './public/images/');
-    },
-    filename: function(req, file, cb){
-        cb(null, file.originalname);
-    }
+  destination: function (req, file, cb) {
+    cb(null, './public/images/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  }
 });
 const upload = multer({ storage });
-//mobile and camera registration form
-router.get("/reg/:category", ensureAuthenticated, (req, res) => {
-  var cat = req.params.category;
 
-  var mobile = false;
-  var camera = false;
-
-  if (cat === 'mobile') {
-    mobile = true;
-  }
-  if (cat === 'camera') {
-    camera = true;
-  }
-  res.render("products/registration_phone_camera", { mobile: mobile, camera: camera, category: cat });
-});
-
-
-//Product registration form
-router.get("/register/:category", ensureAuthenticated, (req, res) => {
-  var cat = req.params.category;
-  var laptop = false;
-  var mobile = false;
-  var camera = false;
-  var parent = false;
-  var processor = false;
-  var customPC = false;
-  var allInOnePC = false;
-  var mainBoard = false;
-  if (cat === 'laptop') {
-    laptop = true;
-    parent = true;
-  }
-  if (cat === "allInOnePC") {
-    allInOnePC = true;
-    parent = true;
-  }
-  if (cat === "customPC") {
-    allInOnePC = true;
-    customPC = true;
-    parent = true;
-  }
-  if (cat === 'processor') {
-    processor = true;
-  }
-  if (cat === 'mainBoard') {
-    mainBoard = true;
-  }
-  if (cat === 'mobile') {
-    mobile = true;
-  }
-  if (cat === 'camera') {
-    camera = true;
-  }
-  res.render("products/register", { mainBoard: mainBoard, laptop: laptop, mobile: mobile, camera: camera, allInOnePC: allInOnePC, parent: parent, category: cat, customPC: customPC, processor: processor });
-});
-
-//modile camera registration
-router.post("/regSave/:category", ensureAuthenticated, upload.single("imagePath"), (req, res) => {
-  let errors = [];
-  if (!req.body.title) {
-    errors.push({
-      text: "Please add a title"
-    });
-  }
-  if (!req.body.category) {
-    errors.push({
-      text: "Please add a category"
-    });
-  }
-  if (!req.body.price) {
-    errors.push({
-      text: "Please add a price"
-    });
-  }
-  if (errors.length > 0) {
-    res.render("products/register", {
-      errors: errors,
-      title: req.body.title,
-      category: req.body.category,
-      price: req.body.price,
-      // imagePath: req.body.imagePath
-    });
-  } else {
-    console.log(req.user.id);
-    var type = req.params.category;
-    if (type === "mobile") {
-      var newProduct = {
-        title: req.body.title,
-        category: req.body.category,
-        price: req.body.price,
-        imagePath: ",,,,,,,,ghfgdh",
-        // "/images/"+ req.file.originalname,
-        user: req.user.id,
-        brand: req.body.brand,
-        model: req.body.model,
-        warranty: req.body.warranty,
-
-        effectivePixels: req.body.effectivePixels,
-        lens: req.body.lens,
-        sensorType: req.body.sensorType,
-        sensorSize: req.body.sensorSize,
-        touchScreen: req.body.touchScreen,
-        screenDots: req.body.screenDots,
-        imageRes: req.body.imageRes,
-        imageRatioWH: req.body.imageRatioWH,
-        videoRes: req.body.videoRes,
-        videoFormat: req.body.videoFormat,
-        playbackZoom: req.body.playbackZoom,
-        iso: req.body.iso,
-        isoMaximum: req.body.isoMaximum,
-        shutterSpeed: req.body.shutterSpeed,
-        autofocusAssistLamp: req.body.autofocusAssistLamp,
-        manualFocus: req.body.manualFocus,
-        numberOfFocusPoints: req.body.numberOfFocusPoints,
-        liveView: req.body.liveView,
-        viewfinderType: req.body.viewfinderType,
-        viewfinderCoverage: req.body.viewfinderCoverage,
-        builtinflash: req.body.builtinflash,
-        flashRange: req.body.flashRange,
-        externalFlash: req.body.externalFlash,
-        flashXSyncSpeed: req.body.flashXSyncSpeed,
-        faceDetection: req.body.faceDetection,
-        redEyeDetection: req.body.redEyeDetection,
-        digitalZoom: req.body.digitalZoom,
-        microphone: req.body.microphone,
-
-        memoryType: req.body.memoryType,
-        usb: req.body.usb,
-        hdmiPort: req.body.hdmiPort,
-        wirelessTechnology: req.body.wirelessTechnology,
-        remoteControl: req.body.remoteControl,
-        battery: req.body.battery,
-        bodyDimension: req.body.bodyDimension,
-        weight: req.body.weight,
-        specialty: req.body.specialty,
-        compatibleLenses: req.body.compatibleLenses,
-        productRange: req.body.productRange,
-
-        releaseDate: req.body.releaseDate
-
-      };
+// returns product entry page
+router.get("/registration", ensureAuthenticated, (req, res) => {
+  
+  var category = [];
+  var brand = [];
+  var model = [];
+  Product.find(function (err, docs) {
+    for (var i = 0; i < docs.length; i++) {
+      category.push(docs[i].category);
+      brand.push(docs[i].brand);
+      model.push(docs[i].model);
     }
-    new Product(newProduct).save().then(product => {
-      req.flash("success_msg", "Product added.");
-      res.redirect("/products/home");
+    res.render("products/reg", {
+      title: "general",
+      category: req.params.category,
+      num: 0,
+      brand: unique(brand),
+      cat: unique(category),
+      model: unique(model)
     });
-  }
-});
-
-//Product register process
-router.post("/registerSave/:category", ensureAuthenticated, upload.single("imagePath"), (req, res) => {
-  let errors = [];
-  if (!req.body.title) {
-    errors.push({
-      text: "Please add a title"
-    });
-  }
-  if (!req.body.category) {
-    errors.push({
-      text: "Please add a category"
-    });
-  }
-  if (!req.body.price) {
-    errors.push({
-      text: "Please add a price"
-    });
-  }
-  if (errors.length > 0) {
-    res.render("products/register", {
-      errors: errors,
-      title: req.body.title,
-      category: req.body.category,
-      price: req.body.price,
-      // imagePath: req.body.imagePath
-    });
-  } else {
-    var type = req.params.category;
-   
-    if (type === "laptop") {
-      console.log(req.params.category);
-      var newProduct = {
-        title: req.body.title,
-        category: req.body.category,
-        price: req.body.price,
-        imagePath: ",,,,,,,,ghfgdh",
-        // "/images/"+ req.file.originalname,
-        user: req.user.id,
-        brand: req.body.brand,
-        model: req.body.model,
-
-        // laptop
-        precessor: req.body.precessor,
-        clockSpeed: req.body.clockSpeed,
-        cache: req.body.cache,
-        displayType: req.body.displayType,
-        displayResolution: req.body.displayResolution,
-        touch: req.body.touch,
-        RAM_type: req.body.RAM_type,
-        RAM: req.body.RAM,
-        storage: req.body.storage,
-        graphicsChipset: req.body.graphicsChipset,
-        graphicsMemory: req.body.graphicsMemory,
-        opticalDevice: req.body.opticalDevice,
-        networking: req.body.networking,
-        displayPort: req.body.displayPort,
-        audioPort: req.body.audioPort,
-        USB_Port: req.body.USB_Port,
-        battery: req.body.battery,
-        weight: req.body.weight,
-        color: req.body.color,
-        operatingSystem: req.body.operatingSystem,
-        partNo: req.body.partNo,
-        warranty: req.body.warranty,
-        generation: req.body.generation,
-        displaySize: req.body.displaySize
-      };
-    }
-
-    else if (type === "customPC") {
-
-      var newProduct = {
-        title: req.body.title,
-        category: req.body.category,
-        price: req.body.price,
-        imagePath: ",,,,,,,,ghfgdh",
-        // "/images/"+ req.file.originalname,
-        user: req.user.id,
-        brand: req.body.brand,
-        model: req.body.model,
-        warranty: req.body.warranty,
-
-        // laptop
-        precessor: req.body.precessor,
-        clockSpeed: req.body.clockSpeed,
-        cache: req.body.cache,
-        displayType: req.body.displayType,
-        displayResolution: req.body.displayResolution,
-        touch: req.body.touch,
-        RAM_type: req.body.RAM_type,
-        RAM: req.body.RAM,
-        storage: req.body.storage,
-        graphicsChipset: req.body.graphicsChipset,
-        graphicsMemory: req.body.graphicsMemory,
-        opticalDevice: req.body.opticalDevice,
-        networking: req.body.networking,
-        displayPort: req.body.displayPort,
-        audioPort: req.body.audioPort,
-        USB_Port: req.body.USB_Port,
-        // battery:req.body.battery,
-        // weight:req.body.weight,
-        color: req.body.color,
-        operatingSystem: req.body.operatingSystem,
-        partNo: req.body.partNo,
-
-        generation: req.body.generation,
-        displaySize: req.body.displaySize,
-        chipset: req.body.chipset,
-        storageType: req.body.storageType,
-
-        monitor: req.body.monitor,
-        speaker: req.body.speaker,
-        keyboard: req.body.keyboard,
-        mouse: req.body.mouse,
-        casing: req.body.casing,
-        others: req.body.others
-
-
-      };
-    }
-    else if (type === "processor") {
-      console.log(req.body.baseFrequency);
-      var newProduct = {
-        title: req.body.title,
-        category: req.body.category,
-        price: req.body.price,
-        imagePath: ",,,,,,,,ghfgdh",
-        // "/images/"+ req.file.originalname,
-        user: req.user.id,
-        brand: req.body.brand,
-        model: req.body.model,
-        warranty: req.body.warranty,
-        generation: req.body.generation,
-
-        baseFrequency: req.body.baseFrequency,
-        turboFrequencyMax: req.body.turboFrequencyMax,
-        core: req.body.core,
-        thread: req.body.thread,
-        smartCache: req.body.smartCache,
-        busSpeed: req.body.busSpeed,
-        tdp: req.body.tdp,
-        lithography: req.body.lithography,
-        memoryMax: req.body.memoryMax,
-        memoryType: req.body.memoryType,
-        memoryChannel: req.body.memoryChannel,
-        socketsSupport: req.body.socketsSupport,
-        specialty: req.body.specialty,
-        compatibleProducts: req.body.compatibleProducts
-      };
-
-    }
-    else if (type === "allInOnePC") {
-      console.log(req.body.displayResolution);
-      var newProduct = {
-        title: req.body.title,
-        category: req.body.category,
-        price: req.body.price,
-        imagePath: ",,,,,,,,ghfgdh",
-        // "/images/"+ req.file.originalname,
-        user: req.user.id,
-        brand: req.body.brand,
-        model: req.body.model,
-        warranty: req.body.warranty,
-        precessor: req.body.precessor,
-        clockSpeed: req.body.clockSpeed,
-        cache: req.body.cache,
-        displayType: req.body.displayType,
-        displayResolution: req.body.displayResolution,
-        touch: req.body.touch,
-        RAM_type: req.body.RAM_type,
-        RAM: req.body.RAM,
-        storage: req.body.storage,
-        graphicsChipset: req.body.graphicsChipset,
-        graphicsMemory: req.body.graphicsMemory,
-        opticalDevice: req.body.opticalDevice,
-        networking: req.body.networking,
-        displayPort: req.body.displayPort,
-        audioPort: req.body.audioPort,
-        USB_Port: req.body.USB_Port,
-        color: req.body.color,
-        operatingSystem: req.body.operatingSystem,
-        partNo: req.body.partNo,
-        generation: req.body.generation,
-        displaySize: req.body.displaySize,
-        chipset: req.body.chipset,
-        storageType: req.body.storageType,
-        monitor: req.body.monitor,
-        speaker: req.body.speaker,
-        keyboard: req.body.keyboard,
-        mouse: req.body.mouse
-      };
-    }
-    else if (type === "mainBoard") {
-
-
-      var newProduct = {
-        title: req.body.title,
-        category: req.body.category,
-        price: req.body.price,
-        imagePath: ",,,,,,,,ghfgdh",
-
-        user: req.user.id,
-        brand: req.body.brand,
-        model: req.body.model,
-        warranty: req.body.warranty,
-
-        formFactor: req.body.formFactor,
-        chipset: req.body.chipset,
-        supportedCPU: req.body.supportedCPU,
-        ramType: req.body.ramType,
-        ramBus: req.body.ramBus,
-        ramMax: req.body.ramMax,
-        ramSlot: req.body.ramSlot,
-        pciExpressx16Slot: req.body.pciExpressx16Slot,
-        sataPort: req.body.sataPort,
-        audioChipset: req.body.audioChipset,
-        audioChannel: req.body.audioChannel,
-        lanChipset: req.body.lanChipset,
-        lanSpeed: req.body.lanSpeed,
-        interfaceUSB: req.body.interfaceUSB,
-        usbPort: req.body.usbPort,
-        vgaPort: req.body.vgaPort,
-        dviPort: req.body.dviPort
-      };
-
-    }
-    else {
-
-    }
-    new Product(newProduct).save().then(product => {
-      req.flash("success_msg", "Product added.");
-      res.redirect("/products/home");
-    });
-  }
+  });
 });
 
 // Fetching by category data in product schema
 router.get("/category/:category", function (req, res, next) {
   resultArray = [];
   Product.find({ category: req.params.category }, function (err, docs) {
-    for (var i = 0; i < docs.length; i += 4) {
-      resultArray.push(docs.slice(i, i + 4));
+    for (var i = 0; i < docs.length; i += 3) {
+      resultArray.push(docs.slice(i, i + 3));
     }
     res.render("categoryWise", {
       title: "general",
@@ -437,8 +90,6 @@ router.get("/category/:category", function (req, res, next) {
     });
   });
 });
-
-
 
 // saving data in product schema
 router.get("/view", function (req, res, next) {
@@ -540,19 +191,44 @@ router.get("/delete/:id", function (req, res, next) {
 // search
 router.post("/search", function (req, res, next) {
   var txt = req.body.key_text;
-  var resultArray = [];
+//   
 
-  Product.find({ $or: [{ category: txt.toLowerCase() }, { title: txt.toLowerCase() }] }, function (err, docs) {
-    for (var i = 0; i < docs.length; i += 3) {
-      resultArray.push(docs.slice(i, i + 3));
+  Product.find({ $or: [{ model: txt.toLowerCase()},{ brand :txt.toLowerCase()},{ category: txt.toLowerCase() },{ title: txt.toLowerCase() }] }, function (err, docs) {
+    if(docs.length >0){
+      var resultArray = [];
+      for (var i = 0; i < docs.length; i +=3) {
+        resultArray.push(docs.slice(i,i+3));
+      }
+      res.render("categoryWise", {
+        title: "general",
+        category: req.params.category,
+        products: resultArray
+      });
     }
-
-    res.render("categoryWise", {
-      title: "general",
-      category: req.params.category,
-      products: resultArray
-    });
-
+    else
+    {
+      var resultArray = [];
+      Product.find(function (err, docs) {
+       
+        for (var i = 0; i < docs.length; i +=3) {
+         if(docs[i].features){
+           var feature = docs[i].features;
+           
+          for (var j = 0; j < feature.length; j ++) {
+            if(feature[j].value === txt){
+              resultArray.push(docs.slice(i,i+3));
+              console.log(resultArray.length);
+            }
+          }
+         }
+        }
+        res.render("categoryWise", {
+          title: "general",
+          category: req.params.category,
+          products: resultArray
+        });
+      });
+    }
   });
 });
 
@@ -566,7 +242,8 @@ router.get("/home", function (req, res, next) {
   rev_resultArrayMobile = [];
   rev_resultArrayCamera = [];
   rev_resultArrayPinned = [];
-  var p = req.params.p;
+  stored_brand = [];
+  stored_product = [];
 
   Product.find({ category: "laptop", home: "true" }, function (err, docs) {
     for (var i = docs.length - 1; i > -1; i -= 1) {
@@ -576,6 +253,15 @@ router.get("/home", function (req, res, next) {
       rev_resultArrayLaptop.push(resultArrayLaptop.slice(i, i + 4));
       break;
     }
+  })
+  .then(() => {
+    Product.find(function (err, docs) {
+      for (var i = 0; i <docs.length; i += 1) {
+        stored_product.push(docs[i].category);
+        stored_brand.push(docs[i].brand)
+      }
+      
+    });
   })
     .then(() => {
       Product.find({ pinned: "true" }, function (err, docs) {
@@ -613,10 +299,201 @@ router.get("/home", function (req, res, next) {
           productsPinned: rev_resultArrayPinned,
           productsLaptops: rev_resultArrayLaptop,
           productsMobiles: rev_resultArrayMobile,
-          productsCameras: rev_resultArrayCamera
+          productsCameras: rev_resultArrayCamera,
+          stored_product:unique(stored_product),
+          stored_brand:unique(stored_brand)
         });
       });
     });
 });
 
+//saves product details
+router.post("/regiSave/:category/:num", ensureAuthenticated, upload.single("imagePath"), (req, res) => {
+  var num = parseInt(req.params.num, 10);
+ 
+  var data = [];
+  if (num > 0) {
+    
+    data.push(JSON.parse("{\"label\":\""+req.body.feature1_label+"\",\"value\":\""+req.body.feature1_value+"\"}"));
+    if (num > 1) {
+      data.push(JSON.parse("{\"label\":\""+req.body.feature2_label+"\",\"value\":\""+req.body.feature2_value+"\"}"));
+      if (num > 2) {
+        data.push(JSON.parse("{\"label\":\""+req.body.feature3_label+"\",\"value\":\""+req.body.feature3_value+"\"}"));
+        if (num > 3) {
+          data.push(JSON.parse("{\"label\":\""+req.body.feature4_label+"\",\"value\":\""+req.body.feature4_value+"\"}"));
+          if (num > 4) {
+            data.push(JSON.parse("{\"label\":\""+req.body.feature5_label+"\",\"value\":\""+req.body.feature5_value+"\"}"));
+            if (num > 5) {
+              data.push(JSON.parse("{\"label\":\""+req.body.feature6_label+"\",\"value\":\""+req.body.feature6_value+"\"}"));
+              if (num > 6) {
+                data.push(JSON.parse("{\"label\":\""+req.body.feature7_label+"\",\"value\":\""+req.body.feature7_value+"\"}"));
+                if (num > 7) {
+                  data.push(JSON.parse("{\"label\":\""+req.body.feature8_label+"\",\"value\":\""+req.body.feature8_value+"\"}"));
+                  if (num > 8) {
+                    data.push(JSON.parse("{\"label\":\""+req.body.feature9_label+"\",\"value\":\""+req.body.feature9_value+"\"}"));
+                    if (num > 9) {
+                      data.push(JSON.parse("{\"label\":\""+req.body.feature10_label+"\",\"value\":\""+req.body.feature10_value+"\"}"));
+                      if (num > 10) {
+                        data.push(JSON.parse("{\"label\":\""+req.body.feature11_label+"\",\"value\":\""+req.body.feature11_value+"\"}"));
+                        if (num > 11) {
+                          data.push(JSON.parse("{\"label\":\""+req.body.feature12_label+"\",\"value\":\""+req.body.feature12_value+"\"}"));
+                          if (num > 12) {
+                            data.push(JSON.parse("{\"label\":\""+req.body.feature13_label+"\",\"value\":\""+req.body.feature13_value+"\"}"));
+                            if (num > 13) {
+                              data.push(JSON.parse("{\"label\":\""+req.body.feature14_label+"\",\"value\":\""+req.body.feature14_value+"\"}"));
+                              if (num > 14) {
+                                data.push(JSON.parse("{\"label\":\""+req.body.feature15_label+"\",\"value\":\""+req.body.feature15_value+"\"}"));
+                                if (num > 15) {
+                                  data.push(JSON.parse("{\"label\":\""+req.body.feature16_label+"\",\"value\":\""+req.body.feature16_value+"\"}"));
+                                  if (num > 16) {
+                                    data.push(JSON.parse("{\"label\":\""+req.body.feature17_label+"\",\"value\":\""+req.body.feature17_value+"\"}"));
+                                    if (num > 17) {
+                                      data.push(JSON.parse("{\"label\":\""+req.body.feature18_label+"\",\"value\":\""+req.body.feature18_value+"\"}"));
+                                      if (num > 18) {
+                                        data.push(JSON.parse("{\"label\":\""+req.body.feature19_label+"\",\"value\":\""+req.body.feature19_value+"\"}"));
+                                        if (num > 19) {
+                                          data.push(JSON.parse("{\"label\":\""+req.body.feature20_label+"\",\"value\":\""+req.body.feature20_value+"\"}"));
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  var newProduct = {
+    title: req.body.title,
+    category: req.body.category,
+    price: req.body.price,
+    imagePath: "/images/"+req.file.originalname,
+    user: req.user.id,
+    brand: req.body.brand,
+    model: req.body.model,
+    warranty: req.body.warranty,
+    features: data,
+    pinned:"",
+    home:""
+  };
+
+  new Product(newProduct).save().then(product => {
+    req.flash("success_msg", "Product added.");
+    res.redirect("/products/home");
+  });
+});
+
+// shows the number of fields user wants
+router.post("/showfields", (req, res) => {
+  var num = parseInt(req.body.num, 10);
+  console.log(num);
+  var one = false;
+  var two = false;
+  var three = false;
+  var four = false;
+  var five = false;
+  var six = false;
+  var seven = false;
+  var eight = false;
+  var nine = false;
+  var ten = false;
+  var eleven = false;
+  var twelve = false;
+  var thirteen = false;
+  var fourteen = false;
+  var fifteen = false;
+  var sixteen = false;
+  var seventeen = false;
+  var eighteen = false;
+  var nineteen = false;
+  var twenty = false;
+  if (num > 0) {
+    one = true;
+    if (num > 1) {
+      two = true;
+      if (num > 2) {
+        three = true;
+        if (num > 3) {
+          four = true;
+          if (num > 4) {
+            five = true;
+            if (num > 5) {
+              six = true;
+              if (num > 6) {
+                seven = true;
+                if (num > 7) {
+                  eight = true;
+                  if (num > 8) {
+                    nine = true;
+                    if (num > 9) {
+                      ten = true;
+                      if (num > 10) {
+                        eleven = true;
+                        if (num > 11) {
+                          twelve = true;
+                          if (num > 12) {
+                            thirteen = true;
+                            if (num > 13) {
+                              fourteen = true;
+                              if (num > 14) {
+                                fifteen = true;
+                                if (num > 15) {
+                                  sixteen = true;
+                                  if (num > 16) {
+                                    seventeen = true;
+                                    if (num > 17) {
+                                      eighteen = true;
+                                      if (num > 18) {
+                                        nineteen = true;
+                                        if (num > 19) {
+                                          twenty = true;
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  var category = [];
+  var brand = [];
+  var model = [];
+  Product.find(function (err, docs) {
+    for (var i = 0; i < docs.length; i++) {
+      category.push(docs[i].category);
+      brand.push(docs[i].brand);
+      model.push(docs[i].model);
+    }
+    res.render("products/reg", {
+      num: num, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen,
+      sixteen, seventeen, eighteen, nineteen, twenty,title: "general", brand: unique(brand), cat: unique(category), model: unique(model)
+    });
+  });
+ 
+ 
+});
+
 module.exports = router;
+

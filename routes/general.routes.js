@@ -3,62 +3,8 @@ const router = express.Router();
 const passport = require("passport");
 var product = require("../models/Product");
 var Cart = require("../models/cart.model");
-
-
-
-
-
-// // returns home page 
-// router.get("/home", function(req, res, next) {
-//   resultArrayLaptop = [];
-//   resultArrayMobile = [];
-//   resultArrayCamera = [];
-//   rev_resultArrayLaptop = [];
-//   rev_resultArrayMobile = [];
-//   rev_resultArrayCamera = [];
-
-
-  
-//   product.find({ category: "laptop" }, function(err, docs) {
-//     for (var i = docs.length-1; i > -1; i -= 1) {    
-//       resultArrayLaptop.push(docs[i]);
-//     }
-//     for (var i = 0; i < resultArrayLaptop.length; i += 3) {    
-//       rev_resultArrayLaptop.push(resultArrayLaptop.slice(i,i+3));
-//       break;
-//     }
-//   })
-//   .then(()=>{
-//     product.find({ category: "mobile" }, function(err, docs) {
-//       for (var i = docs.length-1; i > -1; i -= 1) {    
-//         resultArrayMobile.push(docs[i]);
-//       }
-//       for (var i = 0; i < resultArrayMobile.length; i += 3) {    
-//         rev_resultArrayMobile.push(resultArrayMobile.slice(i,i+3));
-//         break;
-//       }
-//     });
-//   })
-//   .then(()=>{
-//     product.find({ category: "camera" }, function(err, docs) {
-//       for (var i = docs.length-1; i > -1; i -= 1) {    
-//         resultArrayCamera.push(docs[i]);
-//       }
-//       for (var i = 0; i < resultArrayCamera.length; i += 3) {    
-//         rev_resultArrayCamera.push(resultArrayCamera.slice(i,i+3));
-//         break;
-//       }
-//     });
-//   })
-//   .then(()=>{
-//     res.render("home", {
-//       title: "general",
-//       productsLaptops: rev_resultArrayLaptop,
-//       productsMobiles: rev_resultArrayMobile,
-//       productsCameras: rev_resultArrayCamera
-//     });
-//   })
-// });
+var mongo = require("mongodb");
+var split = require('string-split');
 
 
 // Adding product to the cart
@@ -159,14 +105,19 @@ router.get("/FilteredByCategory/:category", function(req, res, next) {
 });
 
 router.get("/singleProduct/:id", function(req, res, next) {
-  resultArray = {};
-  product.findById(req.params.id, function(err, product) {
-    resultArray = product;
+  resultArray = [];
+  var h=[];
+  product.findById(mongo.ObjectID(req.params.id), function(err, product) {
+    
+    resultArray=product;
+    var obj =  resultArray.features;
 
-    res.render("singleProductView", {
+    res.render("single", {
       title: "general",
-      product: resultArray
+      product: resultArray,
+      features:obj
     });
+
   });
 });
 

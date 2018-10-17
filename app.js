@@ -2,7 +2,6 @@ const express = require("express");
 const handlebars = require("express-handlebars");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-
 const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
@@ -11,7 +10,6 @@ const morgan = require('morgan');
 var path = require('path');
 var mongoStore = require('connect-mongo')(session);
 const methodOverride = require("method-override");
-
 
 const app = express();
 
@@ -88,17 +86,10 @@ app.listen(port, () => {
 });
 
 
-
 app.get("/", (req, res) => {
-
   res.redirect('/products/home');
-  // const title = "Welcome To ECL E-Commerce";
-  // res.render("home", {
-  //   title: title
-  // });
 
 });
-
 
 // About route
 app.get("/about", (req, res) => {

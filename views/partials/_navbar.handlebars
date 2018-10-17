@@ -20,18 +20,18 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                         aria-expanded="false">Products <span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/products/FilteredByCategory/laptop">Laptops</a></li>
-                        <li><a href="/products/FilteredByCategory/mobile">Mobiles</a></li>
-                        <li><a href="/products/FilteredByCategory/camera">Cameras</a></li>
+                        {{# each stored_product}}
+                        <li><a href="/products/category/{{this}}">{{this}}</a></li>
+                        {{/each}}
                     </ul>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                         aria-expanded="false">Brands<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/products/category/Demo1">Demo1</a></li>
-                        <li><a href="/products/category/Demo2">Demo2</a></li>
-                        <li><a href="/products/category/Demo3">Demo3</a></li>
+                        {{# each stored_brand}}
+                        <li><a href="/products/category/{{this}}">{{this}}</a></li>
+                        {{/each}}
                     </ul>
                 </li>
                 <li class="nav-item">
@@ -58,26 +58,9 @@
                     <a href="/products/view" class="nav-link">Products</a>
                 </li>
                 <li>
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                        aria-expanded="false">Products Entry <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/products/register/laptop">Laptops</a></li>
-                        <li><a href="/products/reg/mobile">Mobiles</a></li>
-                        <li><a href="/products/register/camera">Cameras</a></li>
-                        <li><a href="/products/register/allInOnePC">All In One PC</a></li>
-                         <li><a href="/products/register/customPC">Custom PC</a></li>
-                         <li><a href="/products/register/processor">Processor</a></li>
-                         <li><a href="/products/register/mainBoard">MainBoard</a></li>
-                    </ul>
+                    <a href="/products/registration" class="nav-link">Products Entry</a>
                 </li>
-                {{!-- <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" id="navbarDropdownMenuLink">Blog
-                        Ideas</a>
-                    <div class="dropdown-menu">
-                        <a href="/ideas" class="dropdown-item">Ideas</a>
-                        <a href="/ideas/add" class="dropdown-item">Add Idea</a>
-                    </div>
-                </li> --}}
+
                 <li class="nav-item">
                     <a href="/users/logout" class="nav-link">Logout</a>
                 </li>

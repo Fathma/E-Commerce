@@ -1,0 +1,124 @@
+<div class="container-fluid" style="width:60%;min-height: 700px">
+    <h1 style="margin: auto">{{category}}</a></h1>
+    <div class="row">
+        <div class="col-sm-2 ">
+        </div>
+        <div class="col-sm-5 ">
+            <Div class="well" style="height: 500px; width: 100%">
+                <img style="height: 100%; width: 100% " src="{{ product.imagePath }}" alt="{{ product.imagePath }}">
+            </div>
+        </div>
+
+        <div class="col-sm-4 ">
+            <Div class="well">
+                <h2>{{ product.title }}</h2>
+                <p class="description">Details:{{ product.description }}</p>
+                <div class="clearfix">
+                    <h3>Price: {{ product.price }} TK</h3>
+
+                    <form action="/add-to-cart/{{ product._id }}" method="POST">
+                        <div class="qoqo pull-left">
+                            <label for="qoqo">
+                                <h4>Quantity:</h4>
+                            </label>
+                            <input type="number" class="form-group" name="qoqo" min="1" value="1" style="width: 70px;">
+                        </div>
+
+                        <input class="btn btn-default pull-right" type="submit" value="Add to cart" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3>Details</h3>
+    <div class="row">
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col-md-3 col-md-6 ">
+                    <strong>Brand</strong>
+                </div>
+                <div class="col-md-3 col-md-6">
+                    <strong>{{product.brand}}</strong>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-3 col-md-6 ">
+                    <strong>Model</strong>
+                </div>
+                <div class="col-md-3 col-md-6">
+                    <strong>{{product.model}}</strong>
+                </div>
+            </div>
+            {{# each features}}
+            <hr>
+            <div class="row">
+                <div class="col-md-3 col-md-6">
+                    <strong>{{this.label}}</strong>
+                </div>
+                <div class="col-md-3 col-md-6">
+                    <strong>{{this.value}}</strong>
+                </div>
+            </div>
+            {{/each}}
+    </div>
+    <div class="row">
+        <h3>Related Products</h3>
+        <hr>
+        <div class="col-sm-4 col-md-3">
+            <div class="thumbnail" style="height: 340px;">
+                <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath }}"
+                        alt="{{ this.imagePath }}"></a>
+                <div class="caption">
+                    <h5> <strong>{{ this.title}}</strong></h5>
+                    <h6 style=>Product ID: 33.098.567 </h6><br>
+                    <div class="clearfix">
+                        <div class="price pull-left">{{ this.price }} TK</div>
+                        <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <div class="thumbnail" style="height: 340px;">
+                <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath }}"
+                        alt="{{ this.imagePath }}"></a>
+                <div class="caption">
+                    <h5> <strong>{{ this.title}}</strong></h5>
+                    <h6 style=>Product ID: 33.098.567 </h6><br>
+                    <div class="clearfix">
+                        <div class="price pull-left">{{ this.price }} TK</div>
+                        <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <div class="thumbnail" style="height: 340px;">
+                <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath }}"
+                        alt="{{ this.imagePath }}"></a>
+                <div class="caption">
+                    <h5> <strong>{{ this.title}}</strong></h5>
+                    <h6 style=>Product ID: 33.098.567 </h6><br>
+                    <div class="clearfix">
+                        <div class="price pull-left">{{ this.price }} TK</div>
+                        <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <div class="thumbnail" style="height: 340px;">
+                <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath }}"
+                        alt="{{ this.imagePath }}"></a>
+                <div class="caption">
+                    <h5> <strong>{{ this.title}}</strong></h5>
+                    <h6 style=>Product ID: 33.098.567 </h6><br>
+                    <div class="clearfix">
+                        <div class="price pull-left">{{ this.price }} TK</div>
+                        <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

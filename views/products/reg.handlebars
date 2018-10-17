@@ -1,0 +1,299 @@
+<div class="container" style="width:40%; min-height: 700px">
+
+    <div class="well">
+
+        <div class="row">
+            <div class="col-md-12 mx-auto">
+                <div class="card card-body">
+                    <h3 class="text-center">{{category}} Registration</h3>
+                    <form action="/products/showfields" method="POST">
+                        <label for="num">Number of Features</label>
+                        <input type="text" name="num" list="nums" class="form-control" value="{{num}}" placeholder="">
+                        <datalist id="nums">
+                            <option value="1">
+                            <option value="2">
+                            <option value="3">
+                            <option value="4">
+                            <option value="5">
+                            <option value="6">
+                            <option value="7">
+                            <option value="8">
+                            <option value="9">
+                            <option value="10">
+                            <option value="11">
+                            <option value="12">
+                            <option value="13">
+                            <option value="14">
+                            <option value="15">
+                            <option value="16">
+                            <option value="17">
+                            <option value="18">
+                            <option value="19">
+                            <option value="20">
+                        </datalist>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                    {{!-- start general --}}
+                    <form action="/products/regiSave/acb/{{num}}" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" name="title" class="form-control" value="{{product_title}}" placeholder="Product's name">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <input type="text" name="category" class="form-control" list="cat" value="{{category}}"
+                                placeholder="Product's type">
+                            <datalist id="cat">
+                                {{# each cat}}
+                                <option value="{{this}}">
+                                    {{/each}}
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Price</label>
+                            <input type="number" name="price" class="form-control" placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="brand">Brand</label>
+                            <input type="text" name="brand" list="brands" class="form-control" placeholder="">
+                            <datalist id="brands">
+                                {{# each brand}}
+                                <option value="{{this}}">
+                                    {{/each}}
+
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label for="model">Model</label>
+                            <input type="text" name="model" list="models" class="form-control" placeholder="">
+                            <datalist id="models">
+                                {{# each brand}}
+                                <option value="{{this}}">
+                                    {{/each}}
+                            </datalist>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="color">Color</label>
+                            <input type="text" name="color" class="form-control" value="{{color}}" placeholder="">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="warranty">Warranty</label>
+                            <input type="text" name="warranty" class="form-control" value="{{warranty}}" placeholder="">
+                        </div>
+
+                        {{# if one}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature1_label">label</label>
+                                <input type="text" name="feature1_label" class="form-control" placeholder="">
+                                <label for="feature1_value">value</label>
+                                <input type="text" name="feature1_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if two}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature2_label">label</label>
+                                <input type="text" name="feature2_label" class="form-control" placeholder="">
+                                <label for="feature2_value">value</label>
+                                <input type="text" name="feature2_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if three}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature3_label">label</label>
+                                <input type="text" name="feature3_label" class="form-control" placeholder="">
+                                <label for="feature3_value">value</label>
+                                <input type="text" name="feature3_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if four}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature4_label">label</label>
+                                <input type="text" name="feature4_label" class="form-control" placeholder="">
+                                <label for="feature4_value">value</label>
+                                <input type="text" name="feature4_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if five}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature5_label">label</label>
+                                <input type="text" name="feature5_label" class="form-control" placeholder="">
+                                <label for="feature5_value">value</label>
+                                <input type="text" name="feature5_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if six}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature6_label">label</label>
+                                <input type="text" name="feature6_label" class="form-control" placeholder="">
+                                <label for="feature6_value">value</label>
+                                <input type="text" name="feature6_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if seven}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature7_label">label</label>
+                                <input type="text" name="feature7_label" class="form-control" placeholder="">
+                                <label for="feature7_value">value</label>
+                                <input type="text" name="feature7_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if eight}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature8_label">label</label>
+                                <input type="text" name="feature8_label" class="form-control" placeholder="">
+                                <label for="feature8_value">value</label>
+                                <input type="text" name="feature8_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if nine}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature9_label">label</label>
+                                <input type="text" name="feature9_label" class="form-control" placeholder="">
+                                <label for="feature9_value">value</label>
+                                <input type="text" name="feature9_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if ten}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature10_label">label</label>
+                                <input type="text" name="feature10_label" class="form-control" placeholder="">
+                                <label for="feature10_value">value</label>
+                                <input type="text" name="feature10_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if eleven}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature11_label">label</label>
+                                <input type="text" name="feature11_label" class="form-control" placeholder="">
+                                <label for="feature11_value">value</label>
+                                <input type="text" name="feature11_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if twelve}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature12_label">label</label>
+                                <input type="text" name="feature12_label" class="form-control" placeholder="">
+                                <label for="feature12_value">value</label>
+                                <input type="text" name="feature12_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if thirteen}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature13_label">label</label>
+                                <input type="text" name="feature13_label" class="form-control" placeholder="">
+                                <label for="feature13_value">value</label>
+                                <input type="text" name="feature13_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if fourteen}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature14_label">label</label>
+                                <input type="text" name="feature14_label" class="form-control" placeholder="">
+                                <label for="feature14_value">value</label>
+                                <input type="text" name="feature14_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if fifteen}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature15_label">label</label>
+                                <input type="text" name="feature15_label" class="form-control" placeholder="">
+                                <label for="feature15_value">value</label>
+                                <input type="text" name="feature15_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if sixteen}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature16_label">label</label>
+                                <input type="text" name="feature16_label" class="form-control" placeholder="">
+                                <label for="feature16_value">value</label>
+                                <input type="text" name="feature16_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if seventeen}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature17_label">label</label>
+                                <input type="text" name="feature17_label" class="form-control" placeholder="">
+                                <label for="feature17_value">value</label>
+                                <input type="text" name="feature17_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if eighteen}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature18_label">label</label>
+                                <input type="text" name="feature18_label" class="form-control" placeholder="">
+                                <label for="feature18_value">value</label>
+                                <input type="text" name="feature18_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if nineteen}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature19_label">label</label>
+                                <input type="text" name="feature19_label" class="form-control" placeholder="">
+                                <label for="feature19_value">value</label>
+                                <input type="text" name="feature19_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{# if twenty}}
+                        <div class="well">
+                            <div class="form-group">
+                                <label for="feature20_label">label</label>
+                                <input type="text" name="feature20_label" class="form-control" placeholder="">
+                                <label for="feature20_value">value</label>
+                                <input type="text" name="feature20_value" class="form-control" placeholder="">
+                            </div>
+                        </div>
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+                        {{/if}}
+
+                        <div class="form-group">
+                            <label for="imagePath">Image</label>
+                            <input type="file" name="imagePath" accept="image/png, image/jpeg" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
