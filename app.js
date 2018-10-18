@@ -14,8 +14,8 @@ const methodOverride = require("method-override");
 const app = express();
 
 // Load routes controller
-const usersController = require("./routes/usersController");
-const productsController = require("./routes/productsController");
+const usersController = require("./routes/users.routes");
+const productsController = require("./routes/products.routes");
 var general = require('./routes/general.routes');
 
 // Passport config
