@@ -53,7 +53,7 @@
     {{# each this}}
     <div class="col-sm-6 col-md-3">
       <div class="thumbnail" style="height: 370px;background-color: #efe0ae">
-        <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath }}"
+        <a href="/products/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="data:image/png;base64,{{ this.imagePath }}"
             alt="{{ this.title}}"></a>
 
         <div class="caption">
@@ -64,7 +64,7 @@
             <div class="price pull-left">
               <h4>TK {{ this.price }} </h4>
             </div>
-            <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+            <a href="/products/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@
     <div class="col-sm-6 col-md-3">
       <div class="thumbnail" style="height: 340px;">
 
-        <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath}}"
+        <a href="/products/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="data:image/png;base64,{{ this.imagePath}}"
             alt="{{ this.title}}"></a>
 
         <div class="caption">
@@ -95,7 +95,7 @@
             <div class="price pull-left">
               <h4>TK {{ this.price }} </h4>
             </div>
-            <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+            <a href="/products/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
           </div>
         </div>
       </div>
@@ -115,7 +115,7 @@
     <div class="col-sm-6 col-md-3">
       <div class="thumbnail" style="height: 340px;">
 
-        <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath }}"
+        <a href="/products/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="data:image/png;base64,{{ this.imagePath }}"
             alt="{{ this.title }}"></a>
 
 
@@ -128,7 +128,7 @@
             <div class="price pull-left">
               <h4>TK {{ this.price }} </h4>
             </div>
-            <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+            <a href="/products/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
 
           </div>
         </div>
@@ -150,14 +150,14 @@
     {{# each this}}
     <div class="col-sm-6 col-md-3">
       <div class="thumbnail" style="height: 340px;">
-        <a href="/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="{{ this.imagePath }}"
+        <a href="/products/singleProduct/{{ this._id }}"><img style="height: 180px" class="img-responsive" src="data:image/png;base64,{{ this.imagePath }}"
             alt="{{ this.imagePath }}"></a>
         <div class="caption">
           <h5> <strong>{{ this.title}}</strong></h5>
           <h6 style=>Product ID: 33.098.567 </h6><br>
           <div class="clearfix">
             <div class="price pull-left">{{ this.price }} TK</div>
-            <a href="/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
+            <a href="/products/singleProduct/{{ this._id }}" class="btn btn-default pull-right" role="button">Details</a>
           </div>
         </div>
       </div>

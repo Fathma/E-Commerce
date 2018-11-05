@@ -6,43 +6,36 @@
         {{!-- Filter option shows --}}
         <div class="col-sm-3 ">
             <Div class="well">
-
-
-                <label for="priceRange">Price Range:</label>
-                <div class="radio">
-                    <label><input type="radio" name="priceRange">80K-100K</label>
-                </div>
-                <div class="radio">
-                    <label><input type="radio" name="priceRange">60K-79K</label>
-                </div>
-                <div class="radio ">
-                    <label><input type="radio" name="priceRange">30K-59K</label>
-                </div>
-                <div class="radio ">
-                    <label><input type="radio" name="priceRange">10K-29K</label>
-                </div>
-                <div class="radio ">
-                    <label><input type="radio" name="priceRange">1K-9K</label>
-                </div>
-                <hr>
-
-
-                <label for="filterByColor">Color:</label>
-                <div class="radio">
-                    <label><input type="radio" name="filterByColor">Red</label>
-                </div>
-                <div class="radio">
-                    <label><input type="radio" name="filterByColor">Blue</label>
-                </div>
-                <div class="radio ">
-                    <label><input type="radio" name="filterByColor">Black</label>
-                </div>
-                <div class="radio ">
-                    <label><input type="radio" name="filterByColor">Gray</label>
-                </div>
-                <div class="radio ">
-                    <label><input type="radio" name="filterByColor">Pink</label>
-                </div>
+                <form action="">
+                    <label for="category">Model</label>
+                    <input type="text" name="category" class="form-control" list="cat" value="{{model}}"
+                        placeholder="Product's type">
+                    <datalist id="cat">
+                        {{# each gfh}}
+                        <option value="{{this}}">
+                        {{/each}}
+                    </datalist>
+                    <br>
+                    <label for="category">Color</label>
+                    <input type="text" name="category" class="form-control" list="cat" value="{{color}}"
+                        placeholder="Product's type">
+                    <datalist id="cat">
+                        {{# each fgh}}
+                        <option value="{{this}}">
+                        {{/each}}
+                    </datalist>
+                    <br>
+                    <label for="category">Price</label>
+                    <input type="text" name="category" class="form-control" list="cat" value="{{category}}"
+                        placeholder="Product's type">
+                    <datalist id="cat">
+                        {{# each fgh}}
+                        <option value="{{this}}">
+                        {{/each}}
+                    </datalist>
+                    <br>
+                     <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
             </Div>
 
 
@@ -57,7 +50,7 @@
                 {{# each this}}
                 <div class="col-sm-6 col-md-4">
                     <div class="thumbnail" style="height: 340px">
-                        <a href="/singleProduct/{{ this._id }}"><img style="height: 200px" class="img-responsive" src="{{ this.imagePath }}" alt="{{ this.imagePath }}"></a>
+                        <a href="/singleProduct/{{ this._id }}"><img style="height: 200px" class="img-responsive" src="data:image/png;base64,{{ this.imagePath }}" alt="{{ this.imagePath }}"></a>
                         <div class="caption">
                             <h3>{{ this.title}}</h3>
                          

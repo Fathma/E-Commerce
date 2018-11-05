@@ -6,6 +6,7 @@ const Grid = require("gridfs-stream");
 var unique = require('array-unique');
 
 
+
 const mongoURI = "mongodb://localhost:27017/e-commerce_db";
 
 
@@ -20,11 +21,37 @@ conn.once("open", () => {
     gfs = Grid(conn.db, mongoose.mongo);
     gfs.collection("products");
 });
+
+
+
+// returns sub category registration page
+exports.getSub = (req, res) => {
+    res.render("addSubCategory",{
+        category: getCategory(),
+        stored_product: getNavProducts(),
+        stored_brand: getNavBrands()
+    });
+};
+
+// add sub category
+exports.singleProduct = (req, res) => {
+    
+    var newProduct = {
+        category: req.body.category,
+        sub
+      };
+    
+      new Product(newProduct).save().then(product => {
+        req.flash("success_msg", "Product added.");
+        res.redirect("/products/home");
+      });
+};
+
 // single product view
 exports.singleProduct = (req, res) => {
     resultArray = [];
     var h = [];
-    product.findById(mongo.ObjectID(req.params.id), function (err, product) {
+    Product.findById(mongo.ObjectID(req.params.id), function (err, product) {
         resultArray = product;
         var obj = resultArray.features;
 
@@ -142,7 +169,6 @@ exports.unPinToFrontPage = (req, res, next) => {
 
 // Add to home page
 exports.addToHomePage = (req, res, next) => {
-    console.log(req.params.id);
     Product.update(
         { _id: mongo.ObjectID(req.params.id) },
         {
@@ -160,7 +186,6 @@ exports.addToHomePage = (req, res, next) => {
 
 // remove from home page
 exports.removeFromHomePage = (req, res, next) => {
-    console.log(req.params.id);
     Product.update(
         { _id: mongo.ObjectID(req.params.id) },
         {
@@ -190,7 +215,6 @@ exports.deleteProduct = (req, res, next) => {
 // search
 exports.searchProduct = (req, res, next) => {
     var txt = req.body.key_text;
-
     Product.find({ 
         $or: [
             { model: txt.toLowerCase() }, 
@@ -428,7 +452,7 @@ exports.showProductRegistrationFields = (req, res, next) => {
 };
 
 // getting values of items of products in navbar
-function getNavProducts() {
+var getNavProducts= ()=> {
     var stored_product = [];
     Product.find(function (err, docs) {
         docs.map(function (rs) {
@@ -439,7 +463,7 @@ function getNavProducts() {
 }
 
 // getting values of items of brand in navbar
-function getNavBrands() {
+var getNavBrands= ()=> {
     var stored_brand = [];
     Product.find(function (err, docs) {
         docs.map(function (rs) {
@@ -447,6 +471,17 @@ function getNavBrands() {
         })
     });
     return unique(stored_brand);
+}
+
+// getting values of items of brand in navbar
+var getCategory= ()=> {
+    var stored_category = [];
+    Product.find(function (err, docs) {
+        docs.map(function (rs) {
+            stored_category.push(rs.category);
+        })
+    });
+    return unique(stored_category);
 }
 
 

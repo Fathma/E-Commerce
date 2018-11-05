@@ -10,12 +10,12 @@ exports.addToCart = (req, res ,next) => {
 
   product.findById(productId, function(err, product) {
     if (err) {
-      return res.redirect("/singleProduct/"+productId);
+      return res.redirect("/products/singleProduct/"+productId);
     }
     cart.add(product, productId, quantity);
     req.session.cart = cart;
 
-    res.redirect("/singleProduct/"+productId);
+    res.redirect("/products/singleProduct/"+productId);
   });
 };
 
