@@ -1,22 +1,30 @@
-<div class="container" style="width:40%; min-height: 700px">
-    <div class="well">
-        <div class="row">
-            <div class="col-md-12 mx-auto">
-                <div class="card card-body">
-                    <h3 class="text-center">Account login</h3>
-                    <form action="/users/login" method="POST">
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" name="email" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+<div class="login-box">
+    <div class="login-logo">
+        <a href="#"><b>Admin</b>Login</a>
+    </div>
+    <div class="login-box-body">
+        <p class="login-box-msg">Sign in to start your session</p>
+
+        <form action="/users/login" method="POST">
+
+            <div class="form-group has-feedback">
+                <input type="email" name="email" class="form-control" placeholder="Email">
+                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+            </div>
+
+            <div class="form-group has-feedback">
+                <input type="password" name="password" class="form-control" placeholder="Password">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-4">
+                    <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
                 </div>
             </div>
-        </div>
+
+        </form>
+        
+        <a href="/users/register" class="text-center">Register a new membership</a>
     </div>
 </div>

@@ -1,14 +1,12 @@
 //Imports
 var mongo = require("mongodb");
 const Product = require("../models/Product");
+const SubCategory = require("../models/subCategory.model");
 const mongoose = require("mongoose");
 const Grid = require("gridfs-stream");
 var unique = require('array-unique');
 
-
-
-const mongoURI = "mongodb://localhost:27017/e-commerce_db";
-
+const mongoURI = "mongodb://jihad:jihad1234@ds115353.mlab.com:15353/e-commerce_db";
 
 //Mongo connection
 const conn = mongoose.createConnection(mongoURI);
@@ -22,39 +20,20 @@ conn.once("open", () => {
     gfs.collection("products");
 });
 
-
-
-// returns sub category registration page
-exports.getSub = (req, res) => {
-    res.render("addSubCategory",{
-        category: getCategory(),
-        stored_product: getNavProducts(),
-        stored_brand: getNavBrands()
-    });
-};
-
-// add sub category
-exports.singleProduct = (req, res) => {
-    
-    var newProduct = {
-        category: req.body.category,
-        sub
-      };
-    
-      new Product(newProduct).save().then(product => {
-        req.flash("success_msg", "Product added.");
-        res.redirect("/products/home");
-      });
-};
-
 // single product view
 exports.singleProduct = (req, res) => {
-    resultArray = [];
-    var h = [];
-    Product.findById(mongo.ObjectID(req.params.id), function (err, product) {
+    var resultArray = [];
+    Product.findById(mongo.ObjectID(req.params.id))
+    .populate("brand")
+    .populate("owner")
+    .populate({
+        path:"subcategory",
+        populate:{path:"category"}
+    })
+    .exec(function (err, product) {
         resultArray = product;
         var obj = resultArray.features;
-
+        console.log(resultArray.subcategory.category.name)
         res.render("single", {
             title: "general",
             product: resultArray,
@@ -63,9 +42,8 @@ exports.singleProduct = (req, res) => {
     });
 };
 
-// returns product registration page
+// returns registration page
 exports.getRegistrationPage = (req, res) => {
-    var category = [];
     var brand = [];
     var model = [];
     Product.find(function (err, docs) {
@@ -73,7 +51,6 @@ exports.getRegistrationPage = (req, res) => {
             res.send(err);
         } else {
             docs.map(function (rs) {
-                category.push(rs.category);
                 brand.push(rs.brand);
                 model.push(rs.model);
             });
@@ -82,123 +59,162 @@ exports.getRegistrationPage = (req, res) => {
                 category: req.params.category,
                 num: 0,
                 brand: unique(brand),
-                cat: unique(category),
-                model: unique(model),
-                stored_product: getNavProducts(),
-                stored_brand: getNavBrands()
+                model: unique(model)
             });
         }
     });
 };
 
+get_array_of_obj = (unique_arr, feat) => {
+    var last = [];
+    var temp = [];
+    for (var i = 0; i < unique_arr.length; i++) {
+        for (var j = 0; j < feat.length; j++) {
+
+            if (feat[j].label === unique_arr[i]) {
+                temp.push(feat[j].value);
+            }
+        }
+        var obj = "{\"label\":\"" + unique_arr[i] + "\",\"values\":[";
+        for (var n = 0; n < unique(temp).length; n++) {
+            obj += "\"" + unique(temp)[n] + "\"";
+            if (unique(temp).length - 1 > n) {
+                obj += ",";
+            }
+        }
+        obj += "]}";
+
+        var jsn = JSON.parse(obj);
+
+        last.push(jsn);
+        temp = [];
+    }
+    return last
+}
+
 // returns Category wise page
 exports.getCategoryWisePage = (req, res, next) => {
     var resultArray = [];
-    Product.find({ category: req.params.category }, function (err, docs) {
+    var array = [];
+    var feat = [];
+    var brnd = [];
+    var unique_arr = [];
+
+    Product.find({ category: mongo.ObjectID(req.params.category) }, function (err, docs) {
         if (err) {
             res.send(err);
         }
         else {
+            for (var i = 0; i < docs.length; i++) {
+                for (var j = 0; j < docs[i].features.length; j++) {
+                    array.push(docs[i].features[j].label);
+                    brnd.push(docs[i].brand);
+                    feat.push(docs[i].features[j]);
+                }
+            }
+            unique_arr = unique(array);
+            var last = get_array_of_obj(unique_arr, feat);
             for (var i = 0; i < docs.length; i += 3) {
                 resultArray.push(docs.slice(i, i + 3));
             }
+
             res.render("categoryWise", {
                 title: "Products",
                 category: req.params.category,
                 products: resultArray,
-                stored_product: getNavProducts(),
-                stored_brand: getNavBrands()
+                brand_unique: unique(brnd),
+                dropdown_label: last,
+                number: last.length
             });
         }
     });
 };
 
 // returns allproduct page
-exports.getAllProducts = (req, res, next) => {
-    resultArray = [];
-    Product.find(function (err, docs) {
+exports.getEditpage = (req, res, next) => {
+    Product.find({ _id: mongo.ObjectID(req.params.id)})
+    .populate("subcategory")
+    .exec(function (err, docs) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.render("products/update", {
+                title: "All Product",
+                product: docs[0],
+            });
+        }
+    });
+};
+
+// returns edit product stock
+exports.getEditStock = (req, res, next) => {
+
+    Product.findOneAndUpdate({_id: mongo.ObjectID(req.params.id)},
+    {
+        $set:{
+            'quantity.stock':req.body.stock,
+            'quantity.storeLive':req.body.storelive
+        }
+     },
+     { upsert: true },
+     function (err, docs) {
+        if (err) {
+            res.send(err);
+        } 
+    })
+};
+
+// returns Edit stock page
+exports.getEditStockPage = (req, res, next) => {
+    Product.find({_id: mongo.ObjectID(req.params.id)},function (err, docs) {
+        if (err) {
+            res.send(err);
+        } 
+        res.render("editStockInfo", {
+            title: "All Product",
+            product: docs[0]
+        });
+    })
+};
+
+// returns all product with stock info page
+exports.getAllProductStock = (req, res, next) => {
+    var resultArray = [];
+    Product.find().sort({"quantity.stock":-1})
+    .populate("subcategory")
+    .exec(function (err, docs) {
         if (err) {
             res.send(err);
         } else {
             for (var i = docs.length - 1; i > -1; i -= 1) {
                 resultArray.push(docs[i]);
             }
-            res.render("allProductView", {
-                title: "All Product",
-                products: resultArray,
-                stored_product: getNavProducts(),
-                stored_brand: getNavBrands()
-            });
         }
-    });
+        res.render("stock", {
+            title: "All Product",
+            products: resultArray
+        });
+    })
 };
 
-// pin the product to top
-exports.pinToFrontPage = (req, res, next) => {
-    Product.update(
-        { _id: mongo.ObjectID(req.params.id) },
-        {
-            $set: { pinned: "true" }
-        },
-        function (err, bear) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.redirect("/products/view");
-            }
-    });
-};
-
-// unpin the product to top
-exports.unPinToFrontPage = (req, res, next) => {
-    console.log(req.params.id);
-    Product.update(
-        { _id: mongo.ObjectID(req.params.id) },
-        {
-            $set: { pinned: "" }
-        },
-        function (err, bear) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.redirect("/products/view");
+// returns allproduct page
+exports.getAllProducts = (req, res, next) => {
+    var resultArray = [];
+    Product.find()
+    .populate("subcategory")
+    .exec(function (err, docs) {
+        if (err) {
+            res.send(err);
+        } else {
+            for (var i = docs.length - 1; i > -1; i -= 1) {
+                resultArray.push(docs[i]);
             }
         }
-    );
-};
-
-// Add to home page
-exports.addToHomePage = (req, res, next) => {
-    Product.update(
-        { _id: mongo.ObjectID(req.params.id) },
-        {
-            $set: { home: "true" }
-        },
-        function (err, bear) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.redirect("/products/view");
-            }
-        }
-    );
-};
-
-// remove from home page
-exports.removeFromHomePage = (req, res, next) => {
-    Product.update(
-        { _id: mongo.ObjectID(req.params.id) },
-        {
-            $set: { home: "" }
-        },
-        function (err, bear) {
-            if (err) {
-                res.send(err);
-            } else {
-                res.redirect("/products/view");
-            }
-        }
-    );
+        res.render("allProductView", {
+            title: "All Product",
+            products: resultArray
+        });
+    })
 };
 
 // delete product
@@ -212,15 +228,121 @@ exports.deleteProduct = (req, res, next) => {
     });
 };
 
+exports.filter = (req, res, next) => {
+    var num1 = req.body.number;
+    var sr = [];
+    sr.push({ category: mongo.ObjectID(req.params.category) });
+
+    if (req.body.brand != "0") {
+        sr.push({ brand: req.body.brand });
+    }
+    if (req.body.price != "0") {
+        var array_range = (req.body.price).split("-");
+        sr.push({ $and: [{ price: { $gt: parseInt(array_range[0], 10) } }, { price: { $lt: parseInt(array_range[1], 10) } }] });
+    }
+    if (num1 > 0) {
+        if (req.body.v0 != "0") {
+            sr.push({ "features.value": req.body.v0 });
+        }
+        if (num1 > 1) {
+            if (req.body.v1 != "0") {
+                sr.push({ "features.value": req.body.v1 });
+            }
+            if (num1 > 2) {
+                if (req.body.v2 != "0") {
+                    sr.push({ "features.value": req.body.v2 });
+                }
+                if (num1 > 3) {
+                    if (req.body.v3 != "0") {
+                        sr.push({ "features.value": req.body.v3 });
+                    }
+                    if (num1 > 4) {
+                        if (req.body.v4 != "0") {
+                            sr.push({ "features.value": req.body.v4 });
+                        }
+                        if (num1 > 5) {
+                            if (req.body.v5 != "0") {
+                                sr.push({ "features.value": req.body.v5 });
+                            }
+                            if (num1 > 6) {
+                                if (req.body.v6 != "0") {
+                                    sr.push({ "features.value": req.body.v6 });
+                                }
+                                if (num1 > 7) {
+                                    if (req.body.v7 != "0") {
+                                        sr.push({ "features.value": req.body.v7 });
+                                    }
+                                    if (num1 > 8) {
+                                        if (req.body.v8 != "0") {
+                                            sr.push({ "features.value": req.body.v8 });
+                                        }
+                                        if (num1 > 9) {
+                                            if (req.body.v9 != "0") {
+                                                sr.push({ "features.value": req.body.v9 });
+                                            }
+                                            if (num1 > 10) {
+                                                if (req.body.v10 != "0") {
+                                                    sr.push({ "features.value": req.body.v10 });
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    var brnd = [];
+    var resultArray = [];
+    Product.find({
+        $and: sr
+    }, function (err, docs) {
+        if (err) {
+            res.send(err);
+        } else {
+            var feat = [];
+            var array = [];
+            for (var i = 0; i < docs.length; i++) {
+                for (var j = 0; j < docs[i].features.length; j++) {
+                    array.push(docs[i].features[j].label);
+                    brnd.push(docs[i].brand);
+                    feat.push(docs[i].features[j]);
+                }
+            }
+            unique_arr = unique(array);
+            var last = get_array_of_obj(unique_arr, feat)
+
+            for (var i = 0; i < docs.length; i += 3) {
+                resultArray.push(docs.slice(i, i + 3));
+            }
+            res.render("categoryWise", {
+                title: "Products",
+                category: req.params.category,
+                unique_arr: unique(brnd),
+                products: resultArray,
+                dropdown_label: last,
+                number: last.length
+            });
+        }
+    });
+
+}
+
+
 // search
 exports.searchProduct = (req, res, next) => {
     var txt = req.body.key_text;
-    Product.find({ 
+    Product.find({
         $or: [
-            { model: txt.toLowerCase() }, 
-            { brand: txt.toLowerCase() }, 
-            { category: txt.toLowerCase() }, 
-            { title: txt.toLowerCase() }
+            { model: txt.toLowerCase() },
+            { brand: txt.toLowerCase() },
+            { category: txt.toLowerCase() },
+            { name: txt.toLowerCase() }
         ]
     }, function (err, docs) {
         if (err) {
@@ -249,7 +371,6 @@ exports.searchProduct = (req, res, next) => {
                             for (var j = 0; j < feature.length; j++) {
                                 if (feature[j].value === txt) {
                                     resultArray.push(docs.slice(i, i + 3));
-                                    console.log(resultArray.length);
                                 }
                             }
                         }
@@ -257,9 +378,7 @@ exports.searchProduct = (req, res, next) => {
                     res.render("categoryWise", {
                         title: "Products",
                         category: req.params.category,
-                        products: resultArray,
-                        stored_product: getNavProducts(),
-                        stored_brand: getNavBrands()
+                        products: resultArray
                     });
                 });
             }
@@ -267,222 +386,18 @@ exports.searchProduct = (req, res, next) => {
     });
 };
 
-// returns home page
-exports.getHomePage = (req, res, next) => {
-    var resultArrayLaptop = [];
-    var resultArrayMobile = [];
-    var resultArrayCamera = [];
-    var resultArrayPinned = [];
-    var rev_resultArrayLaptop = [];
-    var rev_resultArrayMobile = [];
-    var rev_resultArrayCamera = [];
-    var rev_resultArrayPinned = [];
-    Product.find({ category: "laptop", home: "true" }, function (err, docs) {
-        if (err) {
-            res.send(err);
-        } else {
-            for (var i = docs.length - 1; i > -1; i -= 1) {
-                resultArrayLaptop.push(docs[i]);
-            }
-            for (var i = 0; i < resultArrayLaptop.length; i += 4) {
-                rev_resultArrayLaptop.push(resultArrayLaptop.slice(i, i + 4));
-                break;
-            }
-        }
-    })
-    .then(() => {
-        Product.find({ pinned: "true" }, function (err, docs) {
-            if (err) {
-                res.send(err);
-            } else {
-                for (var i = docs.length - 1; i > -1; i -= 1) {
-                    resultArrayPinned.push(docs[i]);
-                }
-                for (var i = 0; i < resultArrayPinned.length; i += 4) {
-                    rev_resultArrayPinned.push(resultArrayPinned.slice(i, i + 4));
-                    break;
-                }
-            }
-        });
-    })
-    .then(() => {
-        Product.find({ category: "mobile", home: "true" }, function (err, docs) {
-            if (err) {
-                res.send(err);
-            } else {
-                for (var i = docs.length - 1; i > -1; i -= 1) {
-                    resultArrayMobile.push(docs[i]);
-                }
-                for (var i = 0; i < resultArrayMobile.length; i += 4) {
-                    rev_resultArrayMobile.push(resultArrayMobile.slice(i, i + 4));
-                    break;
-                }
-            }
-        });
-    })
-    .then(() => {
-        Product.find({ category: "camera", home: "true" }, function (err, docs) {
-            if (err) {
-                res.send(err);
-            } else {
-                for (var i = docs.length - 1; i > -1; i -= 1) {
-                    resultArrayCamera.push(docs[i]);
-                }
-                for (var i = 0; i < resultArrayCamera.length; i += 4) {
-                    rev_resultArrayCamera.push(resultArrayCamera.slice(i, i + 4));
-                    break;
-                }
-                res.render("home", {
-                    title: "Home",
-                    productsPinned: rev_resultArrayPinned,
-                    productsLaptops: rev_resultArrayLaptop,
-                    productsMobiles: rev_resultArrayMobile,
-                    productsCameras: rev_resultArrayCamera,
-                    stored_product: getNavProducts(),
-                    stored_brand: getNavBrands()
-                });
-            }
-        });
-    });
-};
-
 // shows the number of fields user wants
 exports.showProductRegistrationFields = (req, res, next) => {
-    var num = parseInt(req.body.num, 10);
-    var one = false;
-    var two = false;
-    var three = false;
-    var four = false;
-    var five = false;
-    var six = false;
-    var seven = false;
-    var eight = false;
-    var nine = false;
-    var ten = false;
-    var eleven = false;
-    var twelve = false;
-    var thirteen = false;
-    var fourteen = false;
-    var fifteen = false;
-    var sixteen = false;
-    var seventeen = false;
-    var eighteen = false;
-    var nineteen = false;
-    var twenty = false;
-    if (num > 0) {
-        one = true;
-        if (num > 1) {
-            two = true;
-            if (num > 2) {
-                three = true;
-                if (num > 3) {
-                    four = true;
-                    if (num > 4) {
-                        five = true;
-                        if (num > 5) {
-                            six = true;
-                            if (num > 6) {
-                                seven = true;
-                                if (num > 7) {
-                                    eight = true;
-                                    if (num > 8) {
-                                        nine = true;
-                                        if (num > 9) {
-                                            ten = true;
-                                            if (num > 10) {
-                                                eleven = true;
-                                                if (num > 11) {
-                                                    twelve = true;
-                                                    if (num > 12) {
-                                                        thirteen = true;
-                                                        if (num > 13) {
-                                                            fourteen = true;
-                                                            if (num > 14) {
-                                                                fifteen = true;
-                                                                if (num > 15) {
-                                                                    sixteen = true;
-                                                                    if (num > 16) {
-                                                                        seventeen = true;
-                                                                        if (num > 17) {
-                                                                            eighteen = true;
-                                                                            if (num > 18) {
-                                                                                nineteen = true;
-                                                                                if (num > 19) {
-                                                                                    twenty = true;
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    var category = [];
-    var brand = [];
-    var model = [];
-    Product.find(function (err, docs) {
-        docs.map(function (rs) {
-            category.push(rs.category);
-            brand.push(rs.brand);
-            model.push(rs.model);
+    SubCategory.find({name:req.params.cat},function (err, docs1) {
+            res.render("products/reg", {
+                category:req.params.cat,
+                features: docs1[0].features,
+                num_feature:docs1[0].features.length,
+                title: "Registration",
+               
+            });
         });
-        res.render("products/reg", {
-            num: num, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen,
-            sixteen, seventeen, eighteen, nineteen, twenty,
-            title: "Registration",
-            brand: unique(brand),
-            cat: unique(category),
-            model: unique(model),
-            stored_product: getNavProducts(),
-            stored_brand: getNavBrands()
-        });
-    });
+    
+
 };
-
-// getting values of items of products in navbar
-var getNavProducts= ()=> {
-    var stored_product = [];
-    Product.find(function (err, docs) {
-        docs.map(function (rs) {
-            stored_product.push(rs.category);
-        })
-    });
-    return unique(stored_product);
-}
-
-// getting values of items of brand in navbar
-var getNavBrands= ()=> {
-    var stored_brand = [];
-    Product.find(function (err, docs) {
-        docs.map(function (rs) {
-            stored_brand.push(rs.brand);
-        })
-    });
-    return unique(stored_brand);
-}
-
-// getting values of items of brand in navbar
-var getCategory= ()=> {
-    var stored_category = [];
-    Product.find(function (err, docs) {
-        docs.map(function (rs) {
-            stored_category.push(rs.category);
-        })
-    });
-    return unique(stored_category);
-}
-
-
 

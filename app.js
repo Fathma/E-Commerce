@@ -6,23 +6,32 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
 const dbConfig = require('./config/database');
+var  Category = require("./models/category.model")
+var  SubCategory = require("./models/subCategory.model")
+var  Brand = require("./models/brand.model")
 const morgan = require('morgan');
 var path = require('path');
 var mongoStore = require('connect-mongo')(session);
 const methodOverride = require("method-override");
-
+const Product = require("./models/Product");
+var unique = require('array-unique');
+// role
+const { ensureAuthenticated } = require("./helpers/auth");
+const { Super } = require("./helpers/rolecheck");
+const { SuperPublisher } = require("./helpers/rolecheck");
 const app = express();
 
 // Load routes controller
-const usersController = require("./routes/users.routes");
-const productsController = require("./routes/products.routes");
-var general = require('./routes/general.routes');
+const categoryRoutes = require("./routes/category.routes");
+const usersRoutes = require("./routes/users.routes");
+const productsRoutes = require("./routes/products.routes");
 
 // Passport config
 require("./config/passport")(passport);
 
 // Map global promise
 mongoose.Promise = global.Promise;
+
 
 //DB Connection
 mongoose.connect(dbConfig.mongoURI, (err) =>{
@@ -72,7 +81,27 @@ app.use(function(req, res, next) {
   res.locals.user = req.user || null;
   next();
 });
-
+app.use(function(req, res, next){
+  Category.find({}, function(err, categories){
+      if(err) return next(err);
+      res.locals.cat = categories;
+      next();
+  });
+});
+app.use(function(req, res, next){
+  SubCategory.find({}, function(err, categories){
+      if(err) return next(err);
+      res.locals.categories = categories;
+      next();
+  });
+});
+app.use(function(req, res, next){
+  Brand.find({}, function(err, docs){
+    if(err) return next(err);
+      res.locals.brand =docs;
+      next();
+  });
+});
 app.use(function(req, res, next){
   res.locals.session = req.session;
   next();
@@ -87,7 +116,12 @@ app.listen(port, () => {
 
 
 app.get("/", (req, res) => {
-  res.redirect('/products/home');
+  if(req.user){
+    res.redirect('/users/dashboard');
+  }else{
+    res.redirect('/users/login');
+  }
+ 
 
 });
 
@@ -97,7 +131,8 @@ app.get("/about", (req, res) => {
 });
 
 // Use routes
-app.use('', general);
-app.use("/users", usersController);
-app.use("/products", productsController);
+app.use("/category",ensureAuthenticated, Super, categoryRoutes);
+app.use("/users", usersRoutes);
+app.use("/products",ensureAuthenticated,SuperPublisher, productsRoutes);
+
 

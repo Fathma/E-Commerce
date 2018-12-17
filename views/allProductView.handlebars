@@ -1,8 +1,8 @@
 <div class="container-fluid" style="width:100%;min-height: 700px">
-    
+
     {{# if products}}
     <div class="row">
-        <div class="col-sm-12 col-md-6 col-md-offset-3 col-sm-offset-3">
+        <div class="col-sm-12 col-md-7 col-md-offset-3 col-sm-offset-3">
             <ul class="list-group">
                 <li class="list-group-item">
                     <div class="row">
@@ -12,11 +12,14 @@
                         <div class="col-md-2 ">
                             <strong>Title</strong>
                         </div>
-                        <div class="col-md-2 ">
+                        {{!-- <div class="col-md-2 ">
                             <strong>Category</strong>
-                        </div>
+                        </div> --}}
                         <div class="col-md-2 ">
                             <strong>Price</strong>
+                        </div>
+                        <div class="col-md-2 ">
+                            <strong>created date</strong>
                         </div>
                         <div class="col-md-4 pull-center">
                             <strong>Action</strong>
@@ -24,20 +27,28 @@
                     </div>
                 </li>
                 {{# each products}}
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-2 ">
-                            <img style="height: 50px" class="img-responsive" src="{{ this.imagePath }}" alt="{{ this.title}}">
-                        </div>
-                        <div class="col-md-2 ">
-                            <strong>{{this.title}}</strong>
-                        </div>
-                        <div class="col-md-2 ">
-                            <strong>{{this.category}}</strong>
 
+                <li class="list-group-item">
+
+                    <div class="row">
+                        <a href="/products/singleProduct/{{ this._id }}">
+                        <div class="col-md-2 ">
+                            <img style="height: 50px" class="img-responsive" src="data:image/png;base64,{{ this.image }}"
+                                alt="{{ this.title}}">
                         </div>
                         <div class="col-md-2 ">
-                            <strong>{{this.price}}TK</strong>
+                            <strong>{{this.name}}</strong>
+                        </div>
+                        {{!-- <div class="col-md-2 ">
+                            <strong>{{this.category}}</strong>
+                        </div> --}}
+                        <div class="col-md-2 ">
+ 
+                            <strong>{{this.productPrice.listPrice}}</strong>
+                        </div>
+                        <div class="col-md-2 ">
+ 
+                            <strong>{{this.created}}TK</strong>
                         </div>
                         <div class="col-md-4 ">
                             {{# if this.pinned }}
@@ -51,10 +62,12 @@
                             {{else}}
                             <a href="/products/home/{{this._id}}"> <button class="btn btn-default " type="button">home</button></a>
                             {{/if}}
-                            <a href="/removeAll/{{this._id}}"> <button class="btn btn-default " type="button">Edit</button></a>
+                            <a href="/products/Edit/{{this.subcategory._id}}/{{this._id}}"> <button class="btn btn-default " type="button">Edit</button></a>
                             <a href="/products/delete/{{this._id}}"> <button class="btn btn-default " type="button">Delete</button></a>
                         </div>
+                        </a>
                     </div>
+
                 </li>
                 {{/each }}
 

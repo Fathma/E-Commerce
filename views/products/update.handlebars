@@ -1,0 +1,82 @@
+<div class="box">
+    <div class="register-logo">
+        <a href="#"><b>Product</b>Registration</a>
+    </div>
+
+    <div class="box-body">
+        <p class="login-box-msg">Register a new Product</p>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-md-offset-3 col-sm-offset-3">
+                <div class="well">
+
+                    <h3 class="text-center">{{category}} Registration</h3>
+                    {{!-- start general --}}
+                    <form action="/products/regiSave/{{category}}/{{num_feature}}" method="POST" enctype="multipart/form-data">
+
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" name="title" class="form-control" value="{{product.name}}" placeholder="Product's name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Price</label>
+                            <input type="number" name="price" class="form-control" value="{{product.price}}"
+                                placeholder="">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="brand">Brand</label>
+                            <input type="text" name="brand" list="brands" class="form-control" value="{{product.brand}}">
+                            <datalist id="brands">
+                                <option value="{{product.brand}}">
+                                    {{# each brand}}
+                                <option value="{{this}}">
+                                    {{/each}}
+                            </datalist>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="model">Model</label>
+                            <input type="text" name="model" list="models" class="form-control" value="{{product.model}}">
+                            <datalist id="models">
+                                <option value="{{product.model}}">
+                                    {{# each brand}}
+                                <option value="{{this}}">
+                                    {{/each}}
+                            </datalist>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="color">Color</label>
+                            <input type="text" name="color" class="form-control" value="{{product.color}}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="warranty">Warranty</label>
+                            <input type="text" name="warranty" class="form-control" value="{{product.warrenty}}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" name="quantity" class="form-control" value="{{product.quantity}}">
+                        </div>
+
+                        {{# each product.features}}
+                        <div class="form-group">
+                            <input type="hidden" name="feature{{@index}}_label" value="{{this.label}}">
+                            <label for="feature{{@index}}_value">{{this.label}}</label>
+                            <input type="text" name="feature{{@index}}_value" class="form-control" value="{{this.value}}">
+                        </div>
+                        {{/each}}
+
+                        <div class="form-group">
+                            <label for="imagePath">Image</label>
+                            <input type="file" name="imagePath" accept="image/png, image/jpeg">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,11 +17,14 @@ exports.loginPage = (req, res, next) => {
 exports.registrationPage = (req, res, next) => {
   res.render("users/register");
 };
-
+// User register route
+exports.getDashbash = (req, res, next) => {
+  res.render("dashboard");
+};
 // Login form POST
 exports.login = (req, res, next) => {
   passport.authenticate("local", {
-    successRedirect: "/products/home",
+    successRedirect: "/users/dashboard",
     failureRedirect: "/users/login",
     failureFlash: true
   })(req, res, next);
@@ -45,7 +48,9 @@ exports.userregistration = (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      password2: req.body.password2
+      password2: req.body.password2,
+      role: req.body.role
+
     });
   } else {
     User.findOne({ email: req.body.email }).then(user => {
@@ -56,7 +61,8 @@ exports.userregistration = (req, res, next) => {
         const newUser = new User({
           name: req.body.name,
           email: req.body.email,
-          password: req.body.password
+          password: req.body.password,
+          role: req.body.role
         });
 
         bcrypt.genSalt(10, (err, salt) => {
@@ -82,12 +88,11 @@ exports.userregistration = (req, res, next) => {
     });
   }
 };
-
 // Logout user
 exports.logout = (req, res, next) => {
   req.logout();
   req.flash("success_msg", "You are logged out.");
-  res.redirect("/products/home");
+  res.redirect("/users/login");
 };
 
 
